@@ -6,18 +6,9 @@ import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
 import 'package:http/http.dart' as http;
 part 'sse_event_model.dart';
 
-/// A client for subscribing to Server-Sent Events (SSE).
 class SSEClient {
   static http.Client _client = http.Client(); // Initialize the client once
 
-  /// Subscribe to Server-Sent Events.
-  ///
-  /// [method] is the request method (GET or POST).
-  /// [url] is the URL of the SSE endpoint.
-  /// [header] is a map of request headers.
-  /// [body] is an optional request body for POST requests.
-  ///
-  /// Returns a [Stream] of [SSEModel] representing the SSE events.
   static Stream<SSEModel> subscribeToSSE({
     required SSERequestType method,
     required String url,
@@ -43,7 +34,7 @@ class SSEClient {
     // Add headers to the request
     request.headers.addAll(header);
 
-    // Add body to the request if exists
+    // Add body to the request if it exists
     if (body != null) {
       request.body = jsonEncode(body);
     }
@@ -84,7 +75,7 @@ class SSEClient {
                 currentSSEModel.id = value;
                 break;
               case 'retry':
-                // Handle retry logic if needed
+                // Ignore retry logic if not needed
                 break;
               default:
                 print('---UNHANDLED FIELD---');
@@ -94,78 +85,34 @@ class SSEClient {
           onError: (e) {
             print('---STREAM ERROR---');
             print(e);
-            _retryConnection(
-              method: method,
-              url: url,
-              header: header,
-              streamController: streamController,
-              body: body,
-            );
+            // Propagate error through stream and close
+            streamController.addError(e);
+            streamController.close();
           },
           onDone: () {
             print('---STREAM CLOSED---');
-            _retryConnection(
-              method: method,
-              url: url,
-              header: header,
-              streamController: streamController,
-              body: body,
-            );
+            // Close the stream when done
+            streamController.close();
           },
         );
       }, onError: (e) {
         print('---RESPONSE ERROR---');
         print(e);
-        _retryConnection(
-          method: method,
-          url: url,
-          header: header,
-          streamController: streamController,
-          body: body,
-        );
+        // Propagate error through stream and close
+        streamController.addError(e);
+        streamController.close();
       });
     } catch (e) {
       print('---REQUEST ERROR---');
       print(e);
-      _retryConnection(
-        method: method,
-        url: url,
-        header: header,
-        streamController: streamController,
-        body: body,
-      );
+      // Propagate error through stream and close
+      streamController.addError(e);
+      streamController.close();
     }
 
     return streamController.stream;
   }
 
-  /// Retry the SSE connection after a delay.
-  ///
-  /// [method] is the request method (GET or POST).
-  /// [url] is the URL of the SSE endpoint.
-  /// [header] is a map of request headers.
-  /// [body] is an optional request body for POST requests.
-  /// [streamController] is required to persist the stream from the old connection
-  static void _retryConnection({
-    required SSERequestType method,
-    required String url,
-    required Map<String, String> header,
-    required StreamController<SSEModel> streamController,
-    Map<String, dynamic>? body,
-  }) {
-    print('---RETRYING CONNECTION---');
-    Future.delayed(Duration(seconds: 5), () {
-      subscribeToSSE(
-        method: method,
-        url: url,
-        header: header,
-        oldStreamController: streamController,
-        body: body,
-      );
-    });
-  }
-
-  /// Unsubscribe from the SSE.
   static void unsubscribeFromSSE() {
     _client.close(); // Properly close the HTTP client
     print('---SSE UNSUBSCRIBED AND CLIENT CLOSED---');
