@@ -93,6 +93,7 @@ class SSEClient {
                 /// Get the match of each line through the regex
                 Match match = lineRegex.firstMatch(dataLine)!;
                 var field = match.group(1);
+                print(field);
                 if (field!.isEmpty) {
                   return;
                 }
