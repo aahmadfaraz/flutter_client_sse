@@ -121,47 +121,47 @@ class SSEClient {
                   default:
                     print('---ERROR---');
                     print(dataLine);
-                    _retryConnection(
-                      method: method,
-                      url: url,
-                      header: header,
-                      streamController: streamController,
-                    );
+                    // _retryConnection(
+                    //   method: method,
+                    //   url: url,
+                    //   header: header,
+                    //   streamController: streamController,
+                    // );
                 }
               },
               onError: (e, s) {
                 print('---ERROR---');
                 print(e);
-                _retryConnection(
-                  method: method,
-                  url: url,
-                  header: header,
-                  body: body,
-                  streamController: streamController,
-                );
+                // _retryConnection(
+                //   method: method,
+                //   url: url,
+                //   header: header,
+                //   body: body,
+                //   streamController: streamController,
+                // );
               },
             );
         }, onError: (e, s) {
           print('---ERROR---');
           print(e);
-          _retryConnection(
-            method: method,
-            url: url,
-            header: header,
-            body: body,
-            streamController: streamController,
-          );
+          // _retryConnection(
+          //   method: method,
+          //   url: url,
+          //   header: header,
+          //   body: body,
+          //   streamController: streamController,
+          // );
         });
       } catch (e) {
         print('---ERROR---');
         print(e);
-        _retryConnection(
-          method: method,
-          url: url,
-          header: header,
-          body: body,
-          streamController: streamController,
-        );
+        // _retryConnection(
+        //   method: method,
+        //   url: url,
+        //   header: header,
+        //   body: body,
+        //   streamController: streamController,
+        // );
       }
       return streamController.stream;
     }
