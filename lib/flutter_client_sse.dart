@@ -78,6 +78,8 @@ class SSEClient {
                 // Ignore retry logic if not needed
                 break;
               default:
+                print("*****************");
+                print(field);
                 print('---UNHANDLED FIELD---');
                 print(dataLine);
             }
