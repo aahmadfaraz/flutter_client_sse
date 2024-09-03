@@ -17,8 +17,7 @@ class SSEClient {
     Map<String, dynamic>? body,
   }) {
     // Create or reuse a StreamController
-    final StreamController<SSEModel> streamController =
-        oldStreamController ?? StreamController<SSEModel>.broadcast();
+    final StreamController<SSEModel> streamController = oldStreamController ?? StreamController<SSEModel>.broadcast();
 
     var lineRegex = RegExp(r'^([^:]*)(?::)?(?: )?(.*)?$');
     var currentSSEModel = SSEModel(data: '', id: '', event: '');
@@ -43,10 +42,7 @@ class SSEClient {
       Future<http.StreamedResponse> response = _client.send(request);
 
       response.asStream().listen((data) {
-        data.stream
-            .transform(Utf8Decoder())
-            .transform(LineSplitter())
-            .listen(
+        data.stream.transform(Utf8Decoder()).transform(LineSplitter()).listen(
           (dataLine) {
             if (dataLine.isEmpty) {
               // Event set complete, add to stream
@@ -59,17 +55,17 @@ class SSEClient {
             var field = match.group(1);
             if (field!.isEmpty) return;
 
-            var value = (field == 'data')
-                ? dataLine.substring(5)
-                : match.group(2) ?? '';
+            var value = (field == 'data') ? dataLine.substring(5) : match.group(2) ?? '';
+
+            print("===============================");
+            print(field);
 
             switch (field) {
               case 'event':
                 currentSSEModel.event = value;
                 break;
               case 'data':
-                currentSSEModel.data =
-                    (currentSSEModel.data ?? '') + value + '\n';
+                currentSSEModel.data = (currentSSEModel.data ?? '') + value + '\n';
                 break;
               case 'id':
                 currentSSEModel.id = value;
